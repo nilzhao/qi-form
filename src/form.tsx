@@ -3,9 +3,11 @@ import { FormEvent } from 'react';
 import FieldContext from './field-context';
 import useForm from './use-form';
 
-const Form = (props: any) => {
+const Form = React.forwardRef((props: any, ref) => {
   const { form, children, ...restProps } = props;
   const [formInstance] = useForm(form);
+  React.useImperativeHandle(ref, () => formInstance);
+
   return (
     <form
       {...restProps}
@@ -20,5 +22,5 @@ const Form = (props: any) => {
       </FieldContext.Provider>
     </form>
   );
-};
+});
 export default Form;

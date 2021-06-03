@@ -1,10 +1,6 @@
 import React, { useEffect } from 'react';
 import Form, { Field } from 'qi-form';
-
-const Input = (props) => {
-  const { value, ...restProps } = props;
-  return <input {...restProps} value={value} />;
-};
+import Input from '../components/input';
 
 const BasicForm = () => {
   const [form] = Form.useForm();
