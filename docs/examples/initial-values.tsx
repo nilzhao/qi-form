@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import Form, { Field } from 'qi-form';
 import Input from '../components/input';
 
-const BasicForm = () => {
+const InitialValuesForm = () => {
   const [form] = Form.useForm();
 
   return (
@@ -20,4 +20,4 @@ const BasicForm = () => {
   );
 };
 
-export default BasicForm;
+export default InitialValuesForm;

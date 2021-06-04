@@ -2,7 +2,13 @@ import React from 'react';
 import { Component } from 'react';
 import FieldContext from './field-context';
 
-class Field extends Component<{ name: string; children: any }> {
+interface TProps {
+  name: string;
+  children: any;
+  shouldUpdate?: (prev: any, cur: any) => boolean;
+}
+
+class Field extends Component<TProps> {
   static contextType = FieldContext;
 
   private cancelRegister: any;
@@ -19,8 +25,15 @@ class Field extends Component<{ name: string; children: any }> {
   }
 
   // 每个field都包含此方法,供 form 调用, 更新自己
-  onStoreChanged = () => {
-    this.forceUpdate();
+  onStoreChanged = (prevStore: any, curStore: any) => {
+    const { shouldUpdate } = this.props;
+    if (typeof shouldUpdate === 'function') {
+      if (shouldUpdate(prevStore, curStore)) {
+        this.forceUpdate();
+      }
+    } else {
+      this.forceUpdate();
+    }
   };
 
   // Field 中传进来的子元素变为受控组件，也就是主动添加上 value 和 onChange 属性方法

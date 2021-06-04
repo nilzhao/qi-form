@@ -7,7 +7,7 @@ interface TObj {
 
 class FormStore {
   // 存储表单数据
-  private store: TObj = {};
+  private store: any = {};
   // 所有的字段
   private fieldEntities: any[] = [];
   // 初始值
@@ -25,7 +25,7 @@ class FormStore {
 
   setCallbacks = (callbacks: TObj) => {
     this.callbacks = callbacks;
-  }
+  };
 
   // 表单项注册到 fieldEntities
   registerField = (entity: any) => {
@@ -40,24 +40,28 @@ class FormStore {
   getFieldValue = (name: string) => this.store[name];
   getFieldsValue = () => this.store;
 
-  setFieldsValue = (newStore: TObj) => {
-    this.store = {
-      ...this.store,
-      ...newStore,
-    };
+  notifyObservers = (prevStore: any) => {
     // 通过 fieldEntities 获取到所有表单项，然后遍历去调用表单项的 onStoreChange 方法更新表单项
     this.fieldEntities.forEach((entity: any) => {
       const { name } = entity.props;
       Object.keys(this.store).forEach((key) => {
         if (key === name) {
-          entity.onStoreChanged();
+          entity.onStoreChanged(prevStore, this.getFieldsValue());
         }
       });
     });
   };
 
+  setFieldsValue = (curStore: TObj) => {
+    const prevStore = this.store;
+    if (curStore) {
+      this.store = setValues(this.store, curStore);
+    }
+    this.notifyObservers(prevStore);
+  };
+
   submit = () => {
-    const {onFinish} = this.callbacks
+    const { onFinish } = this.callbacks;
 
     onFinish?.(this.getFieldsValue());
   };

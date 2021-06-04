@@ -2,7 +2,7 @@ import React from 'react';
 import Form, { Field } from 'qi-form';
 import Input from '../components/input';
 
-const SubmitCallbackForm = () => {
+const ShouldUpdateForm = () => {
   const [form] = Form.useForm();
 
   const onFinish = (values: any) => {
@@ -11,15 +11,16 @@ const SubmitCallbackForm = () => {
 
   return (
     <Form form={form} onFinish={onFinish}>
-      <Field name="username">
+      {/* UI不更新 */}
+      <Field name="username" shouldUpdate={() => false}>
         <Input placeholder="请输入用户名" />
       </Field>
       <Field name="password">
-        <Input placeholder="请输入密码" />
+        <Input placeholder="请输入密码" type="password" />
       </Field>
       <button type="submit">提交</button>
     </Form>
   );
 };
 
-export default SubmitCallbackForm;
+export default ShouldUpdateForm;
