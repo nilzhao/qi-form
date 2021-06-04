@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { allPromiseFinish } from './utils/asyncUtil';
 import { setValues } from './utils/valueUtil';
 
 interface TObj {
@@ -15,6 +16,8 @@ class FormStore {
 
   // 所有的回调函数
   private callbacks: TObj = {};
+
+  private errors: any = [];
 
   setInitialValues = (initialValues: any, init: boolean) => {
     this.initialValues = initialValues;
@@ -60,10 +63,56 @@ class FormStore {
     this.notifyObservers(prevStore);
   };
 
-  submit = () => {
-    const { onFinish } = this.callbacks;
+  validateFields = () => {
+    const promiseList: any[] = [];
 
-    onFinish?.(this.getFieldsValue());
+    this.fieldEntities.forEach((entity: any) => {
+      const { name, rules } = entity.props;
+      if (!rules || rules.length === 0) {
+        return;
+      }
+      const promise = entity.validateRules();
+      promiseList.push(
+        promise
+          .then(() => ({ name, errors: [] }))
+          .catch((errors: any) =>
+            Promise.reject({
+              name,
+              errors,
+            }),
+          ),
+      );
+    });
+    const summaryPromise = allPromiseFinish(promiseList);
+    const returnPromise = summaryPromise
+      .then(() => this.getFieldsValue())
+      .catch((results) => {
+        const errorList = results.filter(
+          (result: any) => result && result.errors.length,
+        );
+        return Promise.reject({
+          values: this.getFieldsValue(),
+          errorFields: errorList,
+        });
+      });
+    returnPromise.catch((e) => e);
+    return returnPromise;
+  };
+
+  submit = () => {
+    this.validateFields()
+      .then((values: any) => {
+        const { onFinish } = this.callbacks;
+        try {
+          onFinish?.(values);
+        } catch (error) {
+          console.error(error);
+        }
+      })
+      .catch((err) => {
+        const { onFinishFailed } = this.callbacks;
+        onFinishFailed?.(err);
+      });
   };
 
   getForm = () => ({
