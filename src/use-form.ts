@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { setValues } from './utils/valueUtil';
 
 interface TObj {
   [key: string]: any;
@@ -9,6 +10,15 @@ class FormStore {
   private store: TObj = {};
   // 所有的字段
   private fieldEntities: any[] = [];
+  // 初始值
+  private initialValues: any = {};
+
+  setInitialValues = (initialValues: any, init: boolean) => {
+    this.initialValues = initialValues;
+    if (init) {
+      this.store = setValues({}, initialValues, this.store);
+    }
+  };
 
   // 表单项注册到 fieldEntities
   registerField = (entity: any) => {
@@ -49,6 +59,11 @@ class FormStore {
     setFieldsValue: this.setFieldsValue,
     registerField: this.registerField,
     submit: this.submit,
+    getInternalHooks: () => {
+      return {
+        setInitialValues: this.setInitialValues,
+      };
+    },
   });
 }
 
