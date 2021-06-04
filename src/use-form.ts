@@ -13,12 +13,19 @@ class FormStore {
   // 初始值
   private initialValues: any = {};
 
+  // 所有的回调函数
+  private callbacks: TObj = {};
+
   setInitialValues = (initialValues: any, init: boolean) => {
     this.initialValues = initialValues;
     if (init) {
       this.store = setValues({}, initialValues, this.store);
     }
   };
+
+  setCallbacks = (callbacks: TObj) => {
+    this.callbacks = callbacks;
+  }
 
   // 表单项注册到 fieldEntities
   registerField = (entity: any) => {
@@ -50,7 +57,9 @@ class FormStore {
   };
 
   submit = () => {
-    console.log(this.getFieldsValue());
+    const {onFinish} = this.callbacks
+
+    onFinish?.(this.getFieldsValue());
   };
 
   getForm = () => ({
@@ -62,6 +71,7 @@ class FormStore {
     getInternalHooks: () => {
       return {
         setInitialValues: this.setInitialValues,
+        setCallbacks: this.setCallbacks,
       };
     },
   });
