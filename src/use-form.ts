@@ -5,6 +5,10 @@ import { setValues } from './utils/valueUtil';
 interface TObj {
   [key: string]: any;
 }
+export type ReducerAction = (action: {
+  type: SVGFESpecularLightingElement;
+  payload: any;
+}) => {};
 
 class FormStore {
   // 存储表单数据

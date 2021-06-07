@@ -1,5 +1,5 @@
-import get from 'rc-util/lib/utils/get';
-import set from 'rc-util/lib/utils/set';
+import get from 'rc-util/es/utils/get';
+import set from 'rc-util/es/utils/set';
 import {
   InternalNamePath,
   NamePath,
@@ -39,7 +39,7 @@ export function cloneByNamePathList(
   namePathList: InternalNamePath[],
 ): Store {
   let newStore = {};
-  namePathList.forEach(namePath => {
+  namePathList.forEach((namePath) => {
     const value = getValue(store, namePath);
     newStore = setValue(newStore, namePath, value);
   });
@@ -52,7 +52,7 @@ export function containsNamePath(
   namePath: InternalNamePath,
 ) {
   return (
-    namePathList && namePathList.some(path => matchNamePath(path, namePath))
+    namePathList && namePathList.some((path) => matchNamePath(path, namePath))
   );
 }
 
@@ -75,12 +75,15 @@ function internalSetValues<T>(store: T, values: T): T {
     return newStore;
   }
 
-  Object.keys(values).forEach(key => {
+  Object.keys(values).forEach((key) => {
+    // @ts-ignore
     const prevValue = newStore[key];
+    // @ts-ignore
     const value = values[key];
 
     // If both are object (but target is not array), we use recursion to set deep value
     const recursive = isObject(prevValue) && isObject(value);
+    // @ts-ignore
     newStore[key] = recursive
       ? internalSetValues(prevValue, value || {})
       : value;
@@ -134,8 +137,10 @@ export function isSimilar(source: SimilarObject, target: SimilarObject) {
   const targetKeys = Object.keys(target);
   const keys = new Set([...sourceKeys, ...targetKeys]);
 
-  return [...keys].every(key => {
+  return [...keys].every((key) => {
+    // @ts-ignore
     const sourceValue = source[key];
+    // @ts-ignore
     const targetValue = target[key];
 
     if (
@@ -154,6 +159,7 @@ export function defaultGetValueFromEvent(
 ) {
   const event = args[0];
   if (event && event.target && valuePropName in event.target) {
+    // @ts-ignore
     return (event.target as HTMLInputElement)[valuePropName];
   }
 
